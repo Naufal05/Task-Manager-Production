@@ -24,6 +24,7 @@ class TaskBase(SQLModel):
     completed: bool = Field(default=False)
     priority: PriorityEnum = Field(default=PriorityEnum.medium)
     due_date: Optional[datetime] = Field(default=None)
+    tags: Optional[str] = Field(default=None, max_length=200)
 
 class Task(TaskBase, table=True):
     """
