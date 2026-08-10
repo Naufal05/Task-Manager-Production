@@ -20,6 +20,8 @@ app = FastAPI(
 origins = [
     "http://localhost:5173",  # Vite's default dev server port
     "http://127.0.0.1:5173",
+    "http://localhost:5174",   # add whatever port your terminal actually shows
+    "http://127.0.0.1:5174",
 ]
 
 app.add_middleware(
