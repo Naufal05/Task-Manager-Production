@@ -17,6 +17,7 @@ app = FastAPI(
 # to talk to me" -- without it, our React app's fetch() calls would fail
 # with a CORS error even though the API itself works fine (e.g. via curl
 # or /docs, which aren't subject to browser CORS rules).
+
 origins = [
     "http://localhost:5173",  # Vite's default dev server port
     "http://127.0.0.1:5173",
