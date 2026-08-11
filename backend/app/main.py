@@ -26,8 +26,10 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,      # which frontend origins can call us
-    allow_credentials=True,     # allow cookies/auth headers if we add them later
+    # allow_origins=origins,      # which frontend origins can call us
+    # allow_credentials=True,     # allow cookies/auth headers if we add them later
+    allow_origins=["*"],  # Allows any local frontend origin
+    allow_credentials=False,  # Must be False when allow_origins is ["*"]
     allow_methods=["*"],        # allow GET, POST, PATCH, DELETE, etc.
     allow_headers=["*"],        # allow any request headers (e.g. Content-Type)
 )
