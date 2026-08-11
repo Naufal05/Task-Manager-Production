@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import tasks
+from app.routers import tasks, auth
 
 app = FastAPI(
     title="Task Manager API",
@@ -17,8 +17,6 @@ app = FastAPI(
 # to talk to me" -- without it, our React app's fetch() calls would fail
 # with a CORS error even though the API itself works fine (e.g. via curl
 # or /docs, which aren't subject to browser CORS rules).
-
-
 origins = [
     "http://localhost:5173",  # Vite's default dev server port
     "http://127.0.0.1:5173",
@@ -42,6 +40,7 @@ app.add_middleware(
 
 # Mount our task routes onto the main app. Every route in tasks.py
 # is now live under the /tasks prefix we defined in the router.
+app.include_router(auth.router)
 app.include_router(tasks.router)
 
 

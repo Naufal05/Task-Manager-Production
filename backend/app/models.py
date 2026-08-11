@@ -4,6 +4,7 @@ from typing import Optional
 
 from sqlmodel import SQLModel, Field
 
+
 class PriorityEnum(str, Enum):
     """
     A plain Python Enum, made JSON-friendly by also inheriting from `str`.
@@ -17,14 +18,18 @@ class PriorityEnum(str, Enum):
     high = "high"
 
 
-
 class TaskBase(SQLModel):
+    """
+    Shared fields, used as the base for both the DB table and our
+    request/response schemas. This avoids repeating field definitions
+    three times (table, create-schema, update-schema).
+    """
     title: str = Field(index=True, min_length=1, max_length=100)
     description: Optional[str] = Field(default=None, max_length=500)
     completed: bool = Field(default=False)
     priority: PriorityEnum = Field(default=PriorityEnum.medium)
     due_date: Optional[datetime] = Field(default=None)
-    tags: Optional[str] = Field(default=None, max_length=200)
+
 
 class Task(TaskBase, table=True):
     """
@@ -34,6 +39,11 @@ class Task(TaskBase, table=True):
     """
     id: Optional[int] = Field(default=None, primary_key=True)
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    # Foreign key linking each task to its owner. This is what makes
+    # per-user data isolation possible -- every query will filter on this.
+    owner_id: int = Field(foreign_key="user.id", index=True)
+
 
 class TaskCreate(TaskBase):
     """
@@ -69,7 +79,7 @@ class TaskRead(TaskBase):
 # ---------------------------------------------------------------------------
 # AUTH MODELS
 # ---------------------------------------------------------------------------
- 
+
 class UserBase(SQLModel):
     email: str = Field(unique=True, index=True, max_length=255)
 
@@ -84,6 +94,7 @@ class User(UserBase, table=True):
     hashed_password: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+
 class UserCreate(UserBase):
     """What a client sends to POST /auth/register -- plaintext password,
     accepted ONLY here, hashed immediately, then discarded."""
@@ -95,6 +106,7 @@ class UserRead(UserBase):
     is deliberately excluded, so we never leak even the HASH to clients."""
     id: int
     created_at: datetime
+
 
 class Token(SQLModel):
     """Response shape for a successful login."""
