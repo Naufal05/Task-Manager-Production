@@ -64,3 +64,39 @@ class TaskRead(TaskBase):
     """
     id: int
     created_at: datetime
+
+
+# ---------------------------------------------------------------------------
+# AUTH MODELS
+# ---------------------------------------------------------------------------
+ 
+class UserBase(SQLModel):
+    email: str = Field(unique=True, index=True, max_length=255)
+
+
+class User(UserBase, table=True):
+    """
+    The real 'user' database table. Notice: NO plaintext 'password' field --
+    only 'hashed_password'. We NEVER store or even temporarily hold onto a
+    plaintext password beyond the single request where it's first received.
+    """
+    id: Optional[int] = Field(default=None, primary_key=True)
+    hashed_password: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class UserCreate(UserBase):
+    """What a client sends to POST /auth/register -- plaintext password,
+    accepted ONLY here, hashed immediately, then discarded."""
+    password: str = Field(min_length=8)
+
+
+class UserRead(UserBase):
+    """What we send back after registration/lookup -- notice hashed_password
+    is deliberately excluded, so we never leak even the HASH to clients."""
+    id: int
+    created_at: datetime
+
+class Token(SQLModel):
+    """Response shape for a successful login."""
+    access_token: str
+    token_type: str = "bearer"
